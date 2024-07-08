@@ -16,7 +16,6 @@ const UserController = {
     }
   },
 
-
  async login(req, res) {
     try {
       const user = await User.findOne({
@@ -32,11 +31,17 @@ const UserController = {
     }
   },
 
-  async register(req, res) {
+/*   async getConnectedUser(req,res){
+ 
+  }, */
+
+  async getAll(req, res) {
     try {
-      const user = await User.create(
- {...req.body, role: 'user'})
-      res.status(201).send({ message: 'Usuario registrado con exito', user })
+      const { page = 1, limit = 10 } = req.query
+      const users = await User.find()
+        .limit(limit)
+        .skip((page - 1) * limit)
+      res.send(users)
     } catch (error) {
       console.error(error)
     }

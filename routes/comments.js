@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const CommentsController = require('../controllers/CommentsController')
+const CommentController = require('../controllers/CommentController')
 
 // router.post('/', CommentsController.create)
 // router.get('/', CommentsController.getAll)
