@@ -49,7 +49,7 @@ const UserController = {
   
   async getConnectedUser(req,res){
     try {
-      const user = await User.findOne({ tokens: req.headers.authorization }).select('-password -tokens')
+      const user = await User.findOne({ tokens: req.headers.authorization }).select()
       if (!user) {
         return res.status(404).send({ message: 'Usuario no encontrado' });
       }
@@ -108,7 +108,7 @@ const UserController = {
   }, */
  
 
- /*  async delete(req, res) {
+  async delete(req, res) {
     try {
       const user = await User.findByIdAndDelete(req.params._id)
       res.send({ user, message: 'User deleted' })
@@ -118,7 +118,7 @@ const UserController = {
           message: 'there was a problem trying to remove the user',
         })
     }
-  }, */
+  },
 
  
 }
