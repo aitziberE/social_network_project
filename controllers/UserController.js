@@ -107,7 +107,6 @@ const UserController = {
     }
   }, */
  
-
   async delete(req, res) {
     try {
       const user = await User.findByIdAndDelete(req.params._id)
@@ -118,9 +117,8 @@ const UserController = {
           message: 'there was a problem trying to remove the user',
         })
     }
-  },
+  }
 
- 
 }
 
 module.exports = UserController

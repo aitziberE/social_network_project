@@ -9,6 +9,7 @@ router.put('/id/:_id', authentication, PostController.update)
 router.delete('/id/:_id', authentication, PostController.delete)
 router.get('/all', PostController.getAll)
 router.get('/id/:_id', PostController.getById)
+router.put('/likes/:_id', authentication, PostController.like)
 
 // router.post('/', PostController.create)
 // router.get('/', PostController.getAll)
