@@ -6,16 +6,15 @@ const jwt = require('jsonwebtoken')
 const { jwt_secret } = require('../config/keys.js')
 
 const UserController = {
-  async register(req, res) {
+  async register(req, res, next) {
     try {
       const password = bcrypt.hashSync(req.body.password, 10)
       const user = await User.create({ ...req.body, password: password })
-        res.status(201).send({ message: 'Usuario registrado con exito', user })
+        res.status(201).send({ message: 'Usuario registrado con éxito', user })
     } catch (error) {
-      console.error(error)
-      res
-        .status(500)
-        .send({ message: 'Ha habido un problema con el registro' })
+      error.origin = 'usuario'
+      next(error)
+      res.status(500).send({ message: 'Ha habido un problema con el registro' })
     }
   },
 
@@ -48,9 +47,19 @@ const UserController = {
     }
   },  
   
-  /*   async getConnectedUser(req,res){
-    
-  }, */
+  async getConnectedUser(req,res){
+    try {
+      const user = await User.findOne({ tokens: req.headers.authorization }).select('-password -tokens')
+      if (!user) {
+        return res.status(404).send({ message: 'Usuario no encontrado' });
+      }
+      res.status(200).send({ message: 'Sesión iniciada como ' + user })
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: 'Hubo un problema al obtener la información del usuario' });
+    }
+  },
   
   async getAll(req, res) {
     try {
