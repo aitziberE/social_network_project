@@ -5,11 +5,12 @@ const PostSchema = new mongoose.Schema(
     {
 //    img: ,
         description: String,
-        date: Date(),
-        like: Number,
+        date: { type: Date, default: Date.now },
+        like: { type: Number, default: 0 },
         userId: {
             type: ObjectId,
             ref: 'User',
+            required: true
         },
         commentIds: [{ type: ObjectId, ref: 'Comment' }],
     }, 

@@ -13,6 +13,9 @@ const UserController = {
         res.status(201).send({ message: 'Usuario registrado con exito', user })
     } catch (error) {
       console.error(error)
+      res
+        .status(500)
+        .send({ message: 'Ha habido un problema con el registro' })
     }
   },
 
@@ -23,30 +26,14 @@ const UserController = {
       })
       const token = jwt.sign({ _id: user._id }, jwt_secret)
       if (user.tokens.length > 4) user.tokens.shift()
-      user.tokens.push(token)
+        user.tokens.push(token)
       await user.save()
       res.send({ message: 'Bienvenid@ ' + user.name, token })
     } catch (error) {
       console.error(error)
     }
   },
-
-/*   async getConnectedUser(req,res){
- 
-  }, */
-
-  async getAll(req, res) {
-    try {
-      const { page = 1, limit = 10 } = req.query
-      const users = await User.find()
-        .limit(limit)
-        .skip((page - 1) * limit)
-      res.send(users)
-    } catch (error) {
-      console.error(error)
-    }
-  },
-
+  
   async logout(req, res) {
     try {
       await User.findByIdAndUpdate(req.user._id, {
@@ -59,7 +46,72 @@ const UserController = {
         message: 'Hubo un problema al intentar desconectar al usuario',
       })
     }
-  }, 
+  },  
+  
+  /*   async getConnectedUser(req,res){
+    
+  }, */
+  
+  async getAll(req, res) {
+    try {
+      const { page = 1, limit = 10 } = req.query
+      const users = await User.find()
+        .limit(limit)
+        .skip((page - 1) * limit)
+      res.send(users)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+/*   async getById(req, res) {
+    try {
+      const user = await User.findById(req.params._id)
+      res.send(user)
+    } catch (error) {
+      console.error(error)
+    }
+  }, */
+ 
+ 
+/*   async getUsersByName(req, res) {
+    try {
+      const name = new RegExp(req.params.name, 'i')
+      const users = await User.find({ name })
+      res.send(users)
+    } catch (error) {
+      console.log(error)
+    }
+  }, */
+
+ /*  async update(req, res) {
+    try {
+      const user = await User.findByIdAndUpdate(
+        req.params._id,
+        req.body,
+       // El atributo new: true hará que nos devuelva el objeto modificado. Si no lo pasamos, devolverá el objeto antes de ser modificado. 
+        { new: true }
+      )
+      res.send({ message: 'user successfully updated', user })
+    } catch (error) {
+      console.error(error)
+    }
+  }, */
+ 
+
+ /*  async delete(req, res) {
+    try {
+      const user = await User.findByIdAndDelete(req.params._id)
+      res.send({ user, message: 'User deleted' })
+    } catch (error) {
+      console.error(error)
+      res.status(500).send({
+          message: 'there was a problem trying to remove the user',
+        })
+    }
+  }, */
+
  
 }
+
 module.exports = UserController
