@@ -2,22 +2,15 @@ const express = require('express')
 const router = express.Router()
 const UserController = require('../controllers/UserController')
 
-router.post('/', UserController.register)
+const { authentication, isAdmin } = require('../middlewares/authentication')
+
+router.post('/register', UserController.register)
+router.put('/:_id', authentication, isAdmin, UserController.update)
+router.delete('/:_id', authentication, isAdmin, UserController.delete)
 router.post('/login', UserController.login)
-router.put('/', UserController.logout)
-router.get('/me', UserController.getConnectedUser)
-router.get('/all', UserController.getAll)
-// router.get('/id/:_id', UserController.getById)
-// router.get('/name/:name', UserController.getUsersByName)
-// router.put('/:_id', UserController.update)
-// router.delete('/:_id', UserController.delete)
-
-// router.post('/', UserController.create)
-// router.get('/', UserController.getAll)
-// router.get('/id/:_id', UserController.getById)
-// router.get('/name/:name', UserController.getUsersByName)
-// router.delete('/:_id', UserController.delete)
-// router.put('/:_id', UserController.update)
-
+router.post('/logout', authentication, UserController.logout)
+router.get('/me', authentication, UserController.getConnectedUser)
+router.get('/all', authentication, isAdmin, UserController.getAll)
+router.get('/id/:_id', authentication, isAdmin, UserController.getById)
 
 module.exports = router

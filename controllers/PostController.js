@@ -1,8 +1,10 @@
+require("dotenv").config()
 const Post = require('../models/Post')
 const User = require('../models/User')
 const Comment = require('../models/Comment')
 
 const PostController = {
+  
   async create(req, res) {
       try {
         const post = await Post.create({...req.body, userId: req.user._id})
@@ -10,6 +12,7 @@ const PostController = {
         res.status(201).send({ message: 'Post creado con éxito', post })
       } catch (error) {
         console.error(error)
+        res.status(500).send({ message: 'Ha habido un problema al crear el post' })
       }      
   },
 
@@ -23,6 +26,7 @@ const PostController = {
       res.send({ message: 'Post actualizado con éxito', post })
     } catch (error) {
       console.error(error)
+      res.status(500).send({ message: 'Ha habido un problema al actualizar el post' })
     }
   },
 
@@ -36,7 +40,7 @@ const PostController = {
     } catch (error) {
       console.error(error)
       res.status(500).send({
-          message: 'ha surgido un problema al tratar de eliminar el post',
+          message: 'Ha surgido un problema al tratar de eliminar el post',
         })
     }
   },
@@ -66,43 +70,79 @@ const PostController = {
 
   async getById(req, res) {
     try {
-      const post = await Post.findById(req.post._id).populate('commentIds')
+      const post = await Post.findById(req.params._id).populate('commentIds')
+      if (!post) {
+        return res.status(404).send({ message: 'Post no encontrado' })
+      }
       res.send(post)
     } catch (error) {
       console.error(error)
+      res.status(500).send({ message: 'Hubo un problema al obtener el post' })
     }
   },
 
   async getByDescription(req, res) {
     try {
-      const post = await Post.findOne(req.body.description)
+      const description = new RegExp(req.params.description, 'i')
+      const posts = await Post.find({ description })
         .populate('userId')
         .populate('commentIds')
   
-      if (!post) {
-        return res.status(404).send({ message: 'Post no encontrado' });
+      if (!posts.length) {
+        return res.status(404).send({ message: 'Post no encontrado' })
       }
-      res.send(post)
+      res.send(posts)
     } catch (error) {
       console.error(error)
-      res.status(500).send({ message: 'Hubo un problema al obtener el post' });
+      res.status(500).send({ message: 'Hubo un problema al obtener el post' })
     }
   },
 
   async like(req, res) {
     try {
-      const post = await Post.findByIdAndUpdate(
-      req.params._id, { $push: { likes: req.user._id } },{ new: true })
+      const post = await Post.findById(req.params._id)
+      if (post.likes.includes(req.user._id)) {
+        return res.status(400).send({ message: 'Ya has dado like a este post' })
+      }
+      await Post.findByIdAndUpdate(
+        req.params._id,
+        { $addToSet: { likes: req.user._id } },
+        { new: true }
+      )
       await User.findByIdAndUpdate(
         req.user._id,
-        { $push: { likedPosts: req.params._id } },
-        { new: true })
-      res.send(post)
+        { $addToSet: { likedPosts: req.params._id } },
+        { new: true }
+      )
+      res.send({ message: 'Like agregado con éxito', post })
     } catch (error) {
       console.error(error)
-      res.status(500).send({ message: "There was a problem with your request" })
-      }    
+      res.status(500).send({ message: "Hubo un problema con tu solicitud" })
+    }    
   },    
+
+  async unlike(req, res) {
+    try {
+      const post = await Post.findById(req.params._id);
+      if (!post.likes.includes(req.user._id)) {
+        return res.status(400).send({ message: 'No has dado like a este post' })
+      }
+      await Post.findByIdAndUpdate(
+        req.params._id,
+        { $pull: { likes: req.user._id } },
+        { new: true }
+      )
+      await User.findByIdAndUpdate(
+        req.user._id,
+        { $pull: { likedPosts: req.params._id } },
+        { new: true }
+      )
+      res.send({ message: 'Like eliminado con éxito', post })
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Hubo un problema con tu solicitud" })
+    }
+  }
 }
 
 module.exports = PostController

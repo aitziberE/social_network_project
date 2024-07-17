@@ -20,4 +20,5 @@ return err = handleValidationError(err, res)
         res.status(500).send(`Hubo un problema`)
     }  
  }
+ 
 module.exports = { typeError }

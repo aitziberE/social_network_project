@@ -2,11 +2,12 @@ const express = require('express')
 const router = express.Router()
 const CommentController = require('../controllers/CommentController')
 
-// router.post('/', CommentsController.create)
-// router.get('/', CommentsController.getAll)
-// router.get('/id/:_id', CommentsController.getById)
-// router.get('/name/:name', CommentsController.getCommentssByName)
-// router.delete('/:_id', CommentsController.delete)
-// router.put('/:_id', CommentsController.update)
+const { authentication } = require('../middlewares/authentication')
+
+router.post('/', authentication, CommentController.create)
+router.get('/', CommentController.getAll)
+router.get('/id/:_id', CommentController.getById)
+router.delete('/:_id', authentication, CommentController.delete)
+router.put('/:_id', authentication, CommentController.update)
 
 module.exports = router

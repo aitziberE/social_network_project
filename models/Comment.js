@@ -4,7 +4,7 @@ const ObjectId = mongoose.SchemaTypes.ObjectId
 const CommentSchema = new mongoose.Schema(
   {
     content: String,
-    date: Date(),
+    date: { type: Date, default: Date.now },
     userId: {
       type: ObjectId,
       ref: 'User',

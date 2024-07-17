@@ -3,10 +3,9 @@ const ObjectId = mongoose.SchemaTypes.ObjectId
 
 const PostSchema = new mongoose.Schema(
     {
-//    img: ,
         description: String,
         date: { type: Date, default: Date.now },
-        likes: { type: Number, default: 0 },
+        likes: [{ type: ObjectId, ref: 'User' }],
         userId: {
             type: ObjectId,
             ref: 'User',

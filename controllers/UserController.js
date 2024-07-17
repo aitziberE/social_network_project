@@ -1,3 +1,4 @@
+require("dotenv").config()
 const User = require('../models/User')
 const Post = require('../models/Post')
 const Comment = require('../models/Comment')
@@ -6,6 +7,7 @@ const jwt = require('jsonwebtoken')
 const { jwt_secret } = require('../config/keys.js')
 
 const UserController = {
+
   async register(req, res, next) {
     try {
       const password = bcrypt.hashSync(req.body.password, 10)
@@ -17,7 +19,33 @@ const UserController = {
       res.status(500).send({ message: 'Ha habido un problema con el registro' })
     }
   },
+  
+  async update(req, res) {
+    try {
+      const user = await User.findByIdAndUpdate(
+        req.params._id,
+        req.body,
+        { new: true }
+      )
+      res.send({ message: 'Usuario actualizado con éxito', user })
+    } catch (error) {
+      console.error(error)
+      res.status(500).send({ message: 'Ha habido un problema al actualizar el usuario' })
+    }
+  },
 
+  async delete(req, res) {
+    try {
+      const user = await User.findByIdAndDelete(req.params._id)
+      res.send({ message: 'Usuario eliminado', user })
+    } catch (error) {
+      console.error(error)
+      res.status(500).send({
+          message: 'there was a problem trying to remove the user',
+        })
+    }
+  },
+  
  async login(req, res) {
     try {
       const user = await User.findOne({
@@ -50,11 +78,14 @@ const UserController = {
   async getConnectedUser(req,res){
     try {
       const user = await User.findOne({ tokens: req.headers.authorization }).select()
+        .populate('postIds')
+        .populate('commentIds')
+        .populate('likedPosts')
+
       if (!user) {
         return res.status(404).send({ message: 'Usuario no encontrado' });
       }
       res.status(200).send({ message: 'Sesión iniciada como ' + user })
-
     } catch (error) {
       console.error(error);
       res.status(500).send({ message: 'Hubo un problema al obtener la información del usuario' });
@@ -73,52 +104,14 @@ const UserController = {
     }
   },
 
-/*   async getById(req, res) {
+  async getById(req, res) {
     try {
       const user = await User.findById(req.params._id)
       res.send(user)
     } catch (error) {
       console.error(error)
     }
-  }, */
- 
- 
-/*   async getUsersByName(req, res) {
-    try {
-      const name = new RegExp(req.params.name, 'i')
-      const users = await User.find({ name })
-      res.send(users)
-    } catch (error) {
-      console.log(error)
-    }
-  }, */
-
- /*  async update(req, res) {
-    try {
-      const user = await User.findByIdAndUpdate(
-        req.params._id,
-        req.body,
-       // El atributo new: true hará que nos devuelva el objeto modificado. Si no lo pasamos, devolverá el objeto antes de ser modificado. 
-        { new: true }
-      )
-      res.send({ message: 'user successfully updated', user })
-    } catch (error) {
-      console.error(error)
-    }
-  }, */
- 
-  async delete(req, res) {
-    try {
-      const user = await User.findByIdAndDelete(req.params._id)
-      res.send({ user, message: 'User deleted' })
-    } catch (error) {
-      console.error(error)
-      res.status(500).send({
-          message: 'there was a problem trying to remove the user',
-        })
-    }
   }
-
 }
 
 module.exports = UserController
