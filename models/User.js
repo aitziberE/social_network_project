@@ -3,9 +3,28 @@ const ObjectId = mongoose.SchemaTypes.ObjectId
 
 const UserSchema = new mongoose.Schema(
  {
-   name: {
+  firstName: {
    type: String,
    required: [true, 'Por favor rellena tu nombre'],
+   },
+  lastName: {
+   type: String,
+   required: [true, 'Por favor rellena tu apellido'],
+  },
+  age: {
+    type: Number,
+    required: [true, 'Por favor rellena tu edad'],
+    validate: {
+      validator: function (value) {
+        return value >= 18;
+      },
+      message: 'Debes tener 18 años o más',
+    }
+  },
+   username: {
+   type: String,
+   unique: true,
+   required: [true, 'Por favor rellena tu nombre de usuario'],
    },
    email: {
    type: String,
@@ -16,10 +35,6 @@ const UserSchema = new mongoose.Schema(
    password: {
    type: String,
    required: [true, 'Por favor rellena tu contraseña'],
-   },
-   age: {
-   type: Number,
-   required: [true, 'Por favor rellena tu edad'],
    },
    tokens: [],
    likedPosts: [{ type: ObjectId, ref: 'Post' }],

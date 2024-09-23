@@ -2,6 +2,7 @@ require("dotenv").config()
 const User = require('../models/User')
 const Post = require('../models/Post')
 const Comment = require('../models/Comment')
+const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken')
 const { jwt_secret } = require('../config/config.js')
@@ -15,8 +16,7 @@ const UserController = {
         res.status(201).send({ message: 'Usuario registrado con éxito', user })
     } catch (error) {
       error.origin = 'usuario'
-      next(error)
-      res.status(500).send({ message: 'Ha habido un problema con el registro' })
+      next(error) 
     }
   },
   
